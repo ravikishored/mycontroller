@@ -23,18 +23,27 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
+type MatchSpec struct {
+	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
+	// Important: Run "make" to regenerate code after modifying this file
+
+	// namespace
+	Namespace string `json:"namespace"`
+	// labels slice
+	Labels []string `json:"labels"`
+}
+
 // FlipperSpec defines the desired state of Flipper
 type FlipperSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	// Foo is an example field of Guestbook. Edit guestbook_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
-
-	// interval is an example field of RestartDeployments. Specifies the amount of time after which restart the deployments
-	//interval string `json:"interval"`
-	// label is an example field of RestartDeployments. match the deployments
-	//label string `json:"label"`
+	// version field of Flipper
+	Version string `json:"version"`
+	// interval is an example field of Flipper. Specifies the amount of time after which restart the deployments
+	Interval string `json:"interval"`
+	//sepc
+	Match *MatchSpec `json:"match"`
 }
 
 // FlipperStatus defines the observed state of Flipper

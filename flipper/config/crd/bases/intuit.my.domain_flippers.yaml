@@ -35,10 +35,32 @@ spec:
           spec:
             description: FlipperSpec defines the desired state of Flipper
             properties:
-              foo:
-                description: Foo is an example field of Guestbook. Edit guestbook_types.go
-                  to remove/update
+              interval:
+                description: interval is an example field of Flipper. Specifies the
+                  amount of time after which restart the deployments
                 type: string
+              match:
+                description: sepc
+                properties:
+                  labels:
+                    description: labels slice
+                    items:
+                      type: string
+                    type: array
+                  namespace:
+                    description: namespace
+                    type: string
+                required:
+                - labels
+                - namespace
+                type: object
+              version:
+                description: version field of Flipper
+                type: string
+            required:
+            - interval
+            - match
+            - version
             type: object
           status:
             description: FlipperStatus defines the observed state of Flipper
