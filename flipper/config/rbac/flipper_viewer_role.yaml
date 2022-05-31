@@ -1,0 +1,20 @@
+# permissions for end users to view flippers.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: flipper-viewer-role
+rules:
+- apiGroups:
+  - intuit.my.domain
+  resources:
+  - flippers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - intuit.my.domain
+  resources:
+  - flippers/status
+  verbs:
+  - get
