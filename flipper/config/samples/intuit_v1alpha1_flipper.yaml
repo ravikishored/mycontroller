@@ -3,4 +3,9 @@ kind: Flipper
 metadata:
   name: flipper-sample
 spec:
-  # TODO(user): Add fields here
+  interval: 1m
+  version: v2
+  match:
+    labels:
+      mesh: "true"
+    namespace: "mesh"

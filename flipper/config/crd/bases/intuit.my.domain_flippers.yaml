@@ -43,10 +43,10 @@ spec:
                 description: sepc
                 properties:
                   labels:
-                    description: labels slice
-                    items:
+                    additionalProperties:
                       type: string
-                    type: array
+                    description: labels slice
+                    type: object
                   namespace:
                     description: namespace
                     type: string

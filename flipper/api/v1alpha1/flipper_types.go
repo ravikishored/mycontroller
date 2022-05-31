@@ -30,7 +30,7 @@ type MatchSpec struct {
 	// namespace
 	Namespace string `json:"namespace"`
 	// labels slice
-	Labels []string `json:"labels"`
+	Labels map[string]string `json:"labels"`
 }
 
 // FlipperSpec defines the desired state of Flipper
