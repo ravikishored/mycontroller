@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: echodeployment
+  namespace: mesh
+  labels:
+    mesh: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      mesh: "true"
+  template:
+    metadata:
+      labels:
+        mesh: "true"
+    spec:
+      containers:
+      - name: testcontainer
+        image: k8s.gcr.io/echoserver:1.4 

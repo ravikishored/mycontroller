@@ -19,9 +19,14 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/clientcmd"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -57,8 +62,41 @@ func (r *FlipperReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 	fmt.Println("Interval", flipper.Spec.Interval)
-	fmt.Println("match", flipper.Spec.Match)
-	return ctrl.Result{RequeueAfter: flipper.Spec.Interval * time.Second}, nil
+	fmt.Println("Labels", flipper.Spec.Match.Labels)
+	fmt.Println("Namespace", flipper.Spec.Match.Namespace)
+	clientset := GetLocalClient(os.Getenv("KUBECONFIG_PATH"))
+
+	deployments, err := clientset.AppsV1().Deployments(flipper.Spec.Match.Namespace).List(
+		context.TODO(), v1.ListOptions{},
+	)
+	if err != nil {
+		fmt.Println("Failed to fetch deployment")
+	}
+
+	var alldeployments []string
+	for _, v := range deployments.Items {
+		for labelKey, labelValue := range v.Spec.Selector.MatchLabels {
+			for matchKey, matchValue := range flipper.Spec.Match.Labels {
+				if labelKey == matchKey && labelValue == matchValue {
+					alldeployments = append(alldeployments, v.ObjectMeta.Name)
+				}
+			}
+		}
+	}
+
+	fmt.Println("Matching deployments: ", alldeployments)
+	if len(alldeployments) > 0 {
+		data := fmt.Sprintf(`{"spec":{"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt":"%s"}}}}}`, time.Now().String())
+		resultDeployment, err := clientset.AppsV1().Deployments("mesh").Patch(context.Background(),
+			alldeployments[0], types.StrategicMergePatchType, []byte(data), v1.PatchOptions{FieldManager: "kubectl-rollout"})
+		if err != nil {
+			panic(err)
+		}
+		fmt.Print(resultDeployment)
+	}
+
+	return ctrl.Result{RequeueAfter: time.Duration(flipper.Spec.Interval) * time.Second}, nil
+	// return ctrl.Result{RequeueAfter: 5 * time.Second}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
@@ -66,4 +104,17 @@ func (r *FlipperReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&intuitv1alpha1.Flipper{}).
 		Complete(r)
+}
+
+func GetLocalClient(kubeconfigpath string) *kubernetes.Clientset {
+	fmt.Println("Kubeconfig path:", kubeconfigpath)
+	config, err := clientcmd.BuildConfigFromFlags("", kubeconfigpath)
+	if err != nil {
+		panic(err)
+	}
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		panic(err)
+	}
+	return clientset
 }
