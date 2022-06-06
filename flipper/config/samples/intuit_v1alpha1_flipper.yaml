@@ -1,9 +1,9 @@
 apiVersion: intuit.my.domain/v1alpha1
 kind: Flipper
 metadata:
-  name: flipper-sample
+  name: flipper-sample-2
 spec:
-  interval: 1m
+  interval: 10
   version: v2
   match:
     labels:

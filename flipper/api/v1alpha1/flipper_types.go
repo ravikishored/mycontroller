@@ -41,7 +41,7 @@ type FlipperSpec struct {
 	// version field of Flipper
 	Version string `json:"version"`
 	// interval is an example field of Flipper. Specifies the amount of time after which restart the deployments
-	Interval string `json:"interval"`
+	Interval int `json:"interval"`
 	//sepc
 	Match *MatchSpec `json:"match"`
 }
@@ -50,6 +50,7 @@ type FlipperSpec struct {
 type FlipperStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+	IsRestarted bool `json:"isrestarted,omitempty"`
 }
 
 //+kubebuilder:object:root=true
@@ -62,6 +63,7 @@ type Flipper struct {
 
 	Spec   FlipperSpec   `json:"spec,omitempty"`
 	Status FlipperStatus `json:"status,omitempty"`
+	//Temp   string        `json:"temp"`
 }
 
 //+kubebuilder:object:root=true

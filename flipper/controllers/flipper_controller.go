@@ -18,6 +18,8 @@ package controllers
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -48,11 +50,15 @@ type FlipperReconciler struct {
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.11.2/pkg/reconcile
 func (r *FlipperReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger := log.FromContext(ctx)
-
 	// TODO(user): your logic here
-	logger.Info("running control loop")
-
-	return ctrl.Result{}, nil
+	logger.Info("running control loop \n")
+	flipper := &intuitv1alpha1.Flipper{}
+	if err := r.Get(ctx, req.NamespacedName, flipper); err != nil {
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
+	fmt.Println("Interval", flipper.Spec.Interval)
+	fmt.Println("match", flipper.Spec.Match)
+	return ctrl.Result{RequeueAfter: flipper.Spec.Interval * time.Second}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
