@@ -72,7 +72,7 @@ func (r *FlipperReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	if err != nil {
 		fmt.Println("Failed to fetch deployment")
 	}
-
+	fmt.Println("flipper match type = ", flipper.Spec.Match.Labels["mesh"])
 	var alldeployments []string
 	for _, v := range deployments.Items {
 		for labelKey, labelValue := range v.Spec.Selector.MatchLabels {
